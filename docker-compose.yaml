@@ -118,8 +118,8 @@ services:
     build:
       context: ./flask-api
       dockerfile: Dockerfile
-    expose:
-      - 5000  
+    env_file:
+      - ./flask-api/.env 
     ports:
       - "5000:5000"
     depends_on:
