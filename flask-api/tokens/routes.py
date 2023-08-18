@@ -50,9 +50,9 @@ class AvailableToken(Resource):
         for key in redis.keys("*"):
             token_info = redis.hgetall(key)
             allocated = token_info.get('allocated')
-            remaining = int(token_info.get(f"{api_type}_remaining"))
-            reset = int(token_info.get(f"{api_type}_reset"))
-            logging.debug(f"{key} 확인 : {allocated} {remaining} {reset}")
+            remaining = int(token_info.get(f"{api_type}_remaining",0))
+            reset = int(token_info.get(f"{api_type}_reset",0))
+            print(f"{key} 확인 : {allocated} {remaining} {reset}")
             if allocated == "false" and remaining > 0:
                 tokens.append({
                     "key": key,
