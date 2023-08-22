@@ -3,7 +3,7 @@ from flask_restx import Api
 from tokens.routes import tokens_bp, tokens_ns
 from tokens.util import get_aws_secret, update_tokens_usage
 from repo.routes import repo_ns, repo_bp
-import os
+
 
 app = Flask(__name__)
 
@@ -20,6 +20,7 @@ api.add_namespace(tokens_ns, '/tokens')
 api.add_namespace(repo_ns, '/repo')
 app.register_blueprint(tokens_bp, url_prefix='/tokens')
 app.register_blueprint(repo_bp, url_prefix='/repo')
+
 
 @app.before_first_request
 def execute_once():

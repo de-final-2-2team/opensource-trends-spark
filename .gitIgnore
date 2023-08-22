@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 logs/
 env/
+flask-api/config.py
