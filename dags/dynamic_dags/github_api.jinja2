@@ -38,6 +38,20 @@ def load(kind, content):
     load_as_json(dag_root_path, kind, content)
 
 
+@task
+def remove_duplicates(content):
+    unique_items = []
+    item_keys = set()
+
+    for value in content.values():
+        for item in value:
+            item_id = item["NODE_ID"]
+            if item_id not in item_keys:
+                unique_items.append(item)
+                item_keys.add(item_id)
+    return unique_items
+
+
 @task_group
 def get_data():
     tasks = {{ tasks }}
@@ -51,6 +65,9 @@ def get_data():
         except Exception as e:
             logging.error(f"[{{ dag_id }}:{kind}] 데이터 수집 실패\\n" + repr(e))
             result[kind] = None
+    {% if dag_id == "repo" %}
+    result = remove_duplicates(result)
+    {% endif %}
     return result
 
 
