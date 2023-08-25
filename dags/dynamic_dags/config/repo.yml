@@ -15,9 +15,11 @@ tasks:
       per_page: 100
       page: 1
     columns:
-      NODE_ID: "node_id"
+      ID: "node_id"
       REPO_NM: "name"
       FULL_NM: "full_name"
+      OWNER_ID: "owner.node_id"
+      OWNER_NM: "owner.login"
       CREATED_AT: "created_at"
       UPDATED_AT: "updated_at"
       PUSHED_AT: "pushed_at"
@@ -37,9 +39,11 @@ tasks:
       per_page: 100
       page: 1
     columns:
-      NODE_ID: "node_id"
+      ID: "node_id"
       REPO_NM: "name"
       FULL_NM: "full_name"
+      OWNER_ID: "owner.node_id"
+      OWNER_NM: "owner.login" 
       CREATED_AT: "created_at"
       UPDATED_AT: "updated_at"
       PUSHED_AT: "pushed_at"
