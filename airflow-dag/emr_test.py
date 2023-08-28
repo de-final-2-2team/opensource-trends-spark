@@ -12,7 +12,7 @@ SPARK_STEPS = [
             "Jar": "command-runner.jar",
             "Args": [
                 'bash', '-c',
-                'pip3 install PyArrow pandas boto3 pyspark --use-feature=2020-resolver && ' +
+                'pip3 install findspark PyArrow pandas boto3 --use-feature=2020-resolver && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_repo_list_transform.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/awsfunc.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_schema.py ./ && ' +

@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import findspark
+findspark.init()
+
 from pyspark.sql import SparkSession
 from pyspark import SparkConf 
 import github_schema
-import github_pddf
+from github_pddf import PD_df
 from awsfunc import awsfunc
+from datetime import datetime
 
 
 # spark session 설정 및 생성
@@ -15,22 +19,22 @@ conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
 
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
+pd_df = PD_df()
 
 # padnas dataframe to spark dataframe
-commit_activity_df= spark.createDataFrame(github_pddf.commit_activity, schema = github_schema.commit_activity)
+commit_activity_df= spark.createDataFrame(pd_df.commit_activity(), schema = github_schema.commit_activity)
 
 commit_activity_df.printSchema()
 
 # 중복 제거
 commit_activity_df.dropDuplicates()
 
-# dataframe to json
 commit_activity_df.show()
-path = 's3a://de-2-2/analytics/github/commit_activity/2023/08/24.json'
 
-commit_activity_json = commit_activity_df.toJSON().collect()
-s3_client = awsfunc('s3')
-print('\n'.join(commit_activity_json))
-s3_client.ec2tos3('\n'.join(commit_activity_json),'de-2-2', 'analytic/github/commit_activity/2023/08/24.json')
+
+# dataframe to parquet
+timestamp = datetime.now().strftime("%Y/%m/%d")
+path = f's3://de-2-2/analytics/github/commit_activity/{timestamp}.parquet'
+commit_activity_df.coalesce(1).write.parquet(path)
 
 spark.stop()

@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import findspark
+findspark.init()
+
 from pyspark.sql.types import StructType, StructField, StringType, FloatType, IntegerType
 
 # repo list spark dataframe schema 설정

@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import findspark
+findspark.init()
+
 from pyspark.sql import SparkSession
 from pyspark import SparkConf 
 import github_schema
-import github_pddf
+from github_pddf import PD_df
 from awsfunc import awsfunc
+from datetime import datetime
 
 # spark session 설정 및 생성
 conf = SparkConf()
@@ -16,21 +20,21 @@ spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 
 # padnas dataframe to spark dataframe
-repo_list_df = spark.createDataFrame(github_pddf.repo_list, schema = github_schema.repo_list)
+pd_df = PD_df()
+repo_list_df = spark.createDataFrame(pd_df.repo_list(), schema = github_schema.repo_list)
 
 repo_list_df.printSchema()
+
 
 # 중복 제거
 repo_list_df.dropDuplicates()
 
-# dataframe to json
 repo_list_df.show()
-path = 's3a://de-2-2/analytics/github/repository_list/2023/08/27.json'
 
-repo_list_json = repo_list_df.toJSON().collect()
-s3_client = awsfunc('s3')
-print('\n'.join(repo_list_json))
-s3_client.ec2tos3('\n'.join(repo_list_json),'de-2-2', 'analytic/github/repository_list/2023/08/27.json')
 
+# dataframe to parquet
+timestamp = datetime.now().strftime("%Y/%m/%d")
+path = f's3://de-2-2/analytics/github/repository_list/{timestamp}.parquet'
+repo_list_df.coalesce(1).write.parquet(path)
 
 spark.stop()
