@@ -29,12 +29,15 @@ commit_activity_df.printSchema()
 # 중복 제거
 commit_activity_df.dropDuplicates()
 
+# 수집날짜 추가
+commit_activity_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
 commit_activity_df.show()
 
 
 # dataframe to parquet
 timestamp = datetime.now().strftime("%Y/%m/%d")
-path = f's3://de-2-2/analytics/github/commit_activity/{timestamp}.parquet'
+path = f's3://de-2-2/analytics/github/commit_activity/{timestamp}'
 commit_activity_df.coalesce(1).write.parquet(path)
 
 spark.stop()

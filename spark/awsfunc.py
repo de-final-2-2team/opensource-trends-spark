@@ -2,16 +2,15 @@
 import json
 import boto3
 import botocore
+from datetime import datetime
 from botocore.exceptions import NoCredentialsError
-# from AWS_key import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+import pandas as pd
 
 class awsfunc:
     def __init__(self, service_name):
         # Boto3 클라이언트 생성 (IAM 역할을 사용)
         session = boto3.session.Session()
         self.client = session.client(
-            # aws_access_key_id=AWS_ACCESS_KEY_ID,
-            # aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
             service_name=service_name,
             region_name="us-east-1"
         )
@@ -46,3 +45,18 @@ class awsfunc:
         content = response["Body"]
         jsonObject = json.loads(content.read().strip())
         return jsonObject
+    
+    def get_file_name_from_s3(self, Bucket, Path):
+        objects = self.client.list_objects(Bucket=Bucket, Prefix = Path)
+        today = datetime.now().date()
+        file_key = ''
+
+        for obj in objects.get('Contents', []):
+            last_modified = obj['LastModified'].date()
+            if last_modified == today:
+                file_path = obj['Key']
+                return file_path
+            
+
+
+    

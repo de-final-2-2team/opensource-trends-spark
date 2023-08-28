@@ -26,26 +26,28 @@ repo_list = StructType([
 # commit activity spark dataframe schema 설정
 commit_activity = StructType([
     StructField("ID", StringType(), False),
-    StructField("AUTHOR_ID", StringType(), False),
     StructField("AUTHOR_NM", StringType(), False),
     StructField("AUTHOR_TYPE", StringType(), False),
     StructField("TOTAL_CNT", IntegerType(), False),
     StructField("WEEK_UTC", IntegerType(), False),
     StructField("ADD_CNT", IntegerType(), False),
     StructField("DEL_CNT", IntegerType(), False),
-    StructField("COMMIT_CNT", IntegerType(), False)
+    StructField("COMMIT_CNT", IntegerType(), False),
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # language_list_spark dataframe schema 설정
 language_list = StructType([
     StructField("LANG_NM", StringType(), True),
     StructField("LANG_BYTE", IntegerType(), False), 
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # release_tag_ spark dataframe schema 설정
 release_tag = StructType([
     StructField("ID", StringType(), False),
     StructField("REL_NM", StringType(), False), 
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # project list spark dataframe schema 설정
@@ -57,6 +59,7 @@ project_list = StructType([
     StructField("PROJ_ST", StringType(), False),
     StructField("CREATED_AT", StringType(), False),
     StructField("UPDATED_AT", StringType(), False),
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # fork list spark dataframe schema 설정
@@ -68,6 +71,7 @@ fork_list = StructType([
     StructField("URL", StringType(), False),
     StructField("CREATED_AT", StringType(), False),
     StructField("UPDATED_AT", StringType(), False),
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # commit list spark dataframe schema 설정
@@ -79,6 +83,7 @@ commit_list = StructType([
     StructField("UPDATED_AT", StringType(), False),
     StructField("MASSAGE", StringType(), False),
     StructField("CREATED_AT", IntegerType(), False),
+    StructField("REPO_ID", StringType(), False)
 ])
 
 # issue and pr list spark dataframe schema 설정
@@ -89,7 +94,8 @@ issue_and_pr = StructType([
     StructField("USER_NM", IntegerType(), False),
     StructField("CREATED_AT", StringType(), False),
     StructField("UPDATED_AT", StringType(), False),
-    StructField("CLOSED_AT", StringType(), False)
+    StructField("CLOSED_AT", StringType(), False),
+    StructField("REPO_ID", StringType(), False)
 ])
 
 

@@ -21,25 +21,40 @@ spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 # padnas dataframe to spark dataframe
 pd_df = PD_df()
-commit_list_df= spark.createDataFrame(pd_df.commit_list(), schema = github_schema.commit_list)
-issue_and_pr_df= spark.createDataFrame(pd_df.issue_and_pr(), schema = github_schema.issue_and_pr)
+issue_list, pr_list, commit_list = pd_df.detail_list()
+commit_df= spark.createDataFrame(commit_list, schema = github_schema.commit_list)
+issue_df= spark.createDataFrame(issue_list, schema = github_schema.issue_and_pr)
+pr_df= spark.createDataFrame(pr_list, schema = github_schema.issue_and_pr)
 
-commit_list_df.printSchema()
-issue_and_pr_df.printSchema()
+
+commit_df.printSchema()
+issue_df.printSchema()
+pr_df.printSchema()
 
 # 중복 제거
-issue_and_pr_df.dropDuplicates()
+commit_df.dropDuplicates()
+issue_df.dropDuplicates()
+pr_df.dropDuplicates()
 
-commit_list_df.show()
-issue_and_pr_df.show()
+# 수집날짜 추가
+commit_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+issue_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+pr_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+commit_df.show()
+issue_df.show()
+pr_df.show()
 
 # dataframe to json
 timestamp = datetime.now().strftime("%Y/%m/%d")
-commit_list_path = f's3://de-2-2/analytics/github/commit_list/{timestamp}.parquet'
-issue_and_pr_path = f's3://de-2-2/analytics/github/issue_and_pr/{timestamp}.parquet'
+commit_path = f's3://de-2-2/analytics/github/commit/{timestamp}'
+issue_path = f's3://de-2-2/analytics/github/issue/{timestamp}'
+pr_path = f's3://de-2-2/analytics/github/pr/{timestamp}'
 
 
-commit_list_df.coalesce(1).write.parquet(commit_list_path)
-issue_and_pr_df.coalesce(1).write.parquet(issue_and_pr_path)
+
+commit_df.coalesce(1).write.parquet(commit_path)
+issue_df.coalesce(1).write.parquet(issue_path)
+pr_df.coalesce(1).write.parquet(pr_path)
 
 spark.stop()

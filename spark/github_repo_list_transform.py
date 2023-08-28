@@ -29,12 +29,15 @@ repo_list_df.printSchema()
 # 중복 제거
 repo_list_df.dropDuplicates()
 
+# 수집날짜 추가
+repo_list_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
 repo_list_df.show()
 
 
 # dataframe to parquet
 timestamp = datetime.now().strftime("%Y/%m/%d")
-path = f's3://de-2-2/analytics/github/repository_list/{timestamp}.parquet'
+path = f's3://de-2-2/analytics/github/repository_list/{timestamp}'
 repo_list_df.coalesce(1).write.parquet(path)
 
 spark.stop()
