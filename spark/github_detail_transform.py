@@ -19,64 +19,30 @@ conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
 
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
-timestamp = datetime.now().strftime("%Y/%m/%d")
+timestamp = datetime.now()
 
 # padnas dataframe to spark dataframe
 pd_df = PD_df()
 issue_list, pr_list, commit_list = pd_df.detail_list()
 
+pd_df_list = [issue_list, pr_list, commit_list]
+pd_df_str_list = ['issue_list', 'pr_list', 'commit_list']
+schema_list = [github_schema.issue_list, github_schema.pr_list, github_schema.commit_list]
 
-if not issue_list.empty:
-    issue_list_df= spark.createDataFrame(issue_list, schema = github_schema.issue_and_pr)
+for i in range(len(pd_df_list)):
+    if not pd_df_list[i].empty:
+        df = spark.createDataFrame(pd_df_list[i], schema = schema_list[i])
+        df.printSchema()
 
-    issue_list_df.printSchema()
+        # 중복 제거
+        df.dropDuplicates()
 
-    # 중복 제거
-    issue_list_df.dropDuplicates()
+        # 수집 날짜 추가
+        df = df.withColumn("COLLECTED_AT", lit(timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")))
+        df.show()
 
-    # 수집날짜 추가
-    issue_list_df = issue_list_df.withColumn("COLLECTED_AT", lit(datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")))
-
-    issue_list_df.show()
-
-    # dataframe to parquet
-    issue_list_path = f's3://de-2-2/analytics/github/issue_list/{timestamp}'
-    issue_list_df.coalesce(1).write.parquet(issue_list_path)
-
-if not pr_list.empty:
-    pr_list_df= spark.createDataFrame(pr_list, schema = github_schema.issue_and_pr)
-
-    pr_list_df.printSchema()
-
-    # 중복 제거
-    pr_list_df.dropDuplicates()
-
-    # 수집날짜 추가
-    pr_list_df = pr_list_df.withColumn("COLLECTED_AT", lit(datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")))
-
-    pr_list_df.show()
-
-    # dataframe to parquet
-    pr_list_path = f's3://de-2-2/analytics/github/pr_list/{timestamp}'
-    pr_list_df.coalesce(1).write.parquet(pr_list_path)
-    
-if not commit_list.empty:
-    commit_list_df= spark.createDataFrame(commit_list, schema = github_schema.commit_list)
-
-    commit_list_df.printSchema()
-
-    # 중복 제거
-    commit_list_df.dropDuplicates()
-
-    # 수집날짜 추가
-    commit_list_df = commit_list_df.withColumn("COLLECTED_AT", lit(datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")))
-
-    commit_list_df.show()
-
-    # dataframe to parquet
-    commit_list_path = f's3://de-2-2/analytics/github/commit_list/{timestamp}'
-    commit_list_df.coalesce(1).write.parquet(commit_list_path)
-    
-
+        # spark dataframe to parquet
+        path = f's3://de-2-2/analytics/github/{pd_df_str_list[i]}/{timestamp.strftime("%Y/%m/%d")}'
+        df.coalesce(1).write.parquet(path)
 
 spark.stop()

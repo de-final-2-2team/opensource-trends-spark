@@ -19,6 +19,7 @@ conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
 
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
+timestamp = datetime.now()
 
 # padnas dataframe to spark dataframe
 pd_df = PD_df()
@@ -31,14 +32,14 @@ repo_list_df.printSchema()
 repo_list_df.dropDuplicates()
 
 # 수집날짜 추가
-repo_list_df = repo_list_df.withColumn("COLLECTED_AT", lit(datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")))
+repo_list_df = repo_list_df.withColumn("COLLECTED_AT", lit(timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")))
 
 repo_list_df.show()
 
 
 # dataframe to parquet
-timestamp = datetime.now().strftime("%Y/%m/%d")
-path = f's3://de-2-2/analytics/github/repository_list/{timestamp}'
+
+path = f's3://de-2-2/analytics/github/repository_list/{timestamp.strftime("%Y/%m/%d")}'
 repo_list_df.coalesce(1).write.parquet(path)
 
 spark.stop()

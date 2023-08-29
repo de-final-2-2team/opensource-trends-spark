@@ -49,11 +49,11 @@ class awsfunc:
     def get_file_name_from_s3(self, Bucket, Path):
         objects = self.client.list_objects(Bucket=Bucket, Prefix = Path)
         today = datetime.now().date() 
-        
+        yesterday = today - timedelta(1)
 
         for obj in objects.get('Contents', []):
             last_modified = obj['LastModified'].date()
-            if last_modified == today:
+            if last_modified == yesterday:
                 file_path = obj['Key']
                 return file_path
             

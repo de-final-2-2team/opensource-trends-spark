@@ -86,12 +86,12 @@ class PD_df:
                         'REPO_ID': REPO_ID
                     })
 
-        release_df = pd.DataFrame(release_json)
+        release_tag_df = pd.DataFrame(release_json)
         project_df = pd.DataFrame(project_json)
         language_df = pd.DataFrame(language_json)
         fork_df = pd.DataFrame(fork_json)
 
-        return release_df, project_df, language_df, fork_df
+        return release_tag_df, project_df, language_df, fork_df
 
     
     def detail_list(self):

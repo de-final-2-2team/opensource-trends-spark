@@ -44,7 +44,7 @@ language_list = StructType([
 ])
 
 # release_tag_ spark dataframe schema 설정
-release_tag = StructType([
+release_tag_list = StructType([
     StructField("ID", StringType(), False),
     StructField("REL_NM", StringType(), False), 
     StructField("REPO_ID", StringType(), False)
@@ -84,8 +84,22 @@ commit_list = StructType([
     StructField("REPO_ID", StringType(), False)
 ])
 
-# issue and pr list spark dataframe schema 설정
-issue_and_pr = StructType([
+# issue list spark dataframe schema 설정
+issue_list = StructType([
+    StructField("ID", StringType(), False),
+    StructField("URL", StringType(), False),
+    StructField("TITLE", StringType(), False),
+    StructField("USER_ID", StringType(), False),
+    StructField("USER_NM", StringType(), False),
+    StructField("STATE", StringType(), True),
+    StructField("CREATED_AT", StringType(), False),
+    StructField("UPDATED_AT", StringType(), True),
+    StructField("CLOSED_AT", StringType(), True),
+    StructField("REPO_ID", StringType(), False)
+])
+
+# pr list spark dataframe schema 설정
+pr_list = StructType([
     StructField("ID", StringType(), False),
     StructField("URL", StringType(), False),
     StructField("TITLE", StringType(), False),
