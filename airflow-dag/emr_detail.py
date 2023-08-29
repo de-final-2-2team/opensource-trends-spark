@@ -6,18 +6,18 @@ from datetime import datetime
 
 SPARK_STEPS = [
     {
-        "Name": "update_packages",      # 시스팀 업데이트
+        "Name": "emr_detail",      # 시스팀 업데이트
         "ActionOnFailure": "CONTINUE",  # 실패해도 다음 스텝 실행
         "HadoopJarStep": {
             "Jar": "command-runner.jar",
             "Args": [
                 'bash', '-c',
                 'pip3 install findspark PyArrow pandas boto3 --use-feature=2020-resolver && ' +
-                'aws s3 cp s3://de-2-2/spark_scripts/github_repo_list_transform.py ./ && ' +
+                'aws s3 cp s3://de-2-2/spark_scripts/github_detail_transform.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/awsfunc.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_schema.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_pddf.py ./ && ' +
-                'python3 github_repo_list_transform.py'
+                'python3 github_detail_transform.py'
             ],
         },
     },
@@ -25,7 +25,7 @@ SPARK_STEPS = [
 
 
 JOB_FLOW_OVERRIDES = {
-    "Name": "DE-2-2-EMR_test",
+    "Name": "DE-2-2-EMR_Detail",
     "ReleaseLabel": "emr-6.12.0",
     "Applications": [{"Name": "Spark"}],
     "LogUri": "s3://de-2-2/cluster-log",
@@ -50,7 +50,7 @@ JOB_FLOW_OVERRIDES = {
 }
 
 with DAG(
-    dag_id="emr_test",
+    dag_id="emr_detail",
     start_date=datetime(2023, 6, 15),
     schedule='@once',
     catchup=False

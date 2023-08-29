@@ -4,6 +4,7 @@ findspark.init()
 
 from pyspark.sql import SparkSession
 from pyspark import SparkConf 
+from pyspark.sql.functions import lit
 import github_schema
 from github_pddf import PD_df
 from awsfunc import awsfunc
@@ -30,7 +31,7 @@ repo_list_df.printSchema()
 repo_list_df.dropDuplicates()
 
 # 수집날짜 추가
-repo_list_df.withColumn("COLLECTED_AT", datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+repo_list_df = repo_list_df.withColumn("COLLECTED_AT", lit(datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")))
 
 repo_list_df.show()
 

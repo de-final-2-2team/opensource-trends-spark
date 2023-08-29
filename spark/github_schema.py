@@ -26,7 +26,7 @@ repo_list = StructType([
 # commit activity spark dataframe schema 설정
 commit_activity = StructType([
     StructField("ID", StringType(), False),
-    StructField("AUTHOR_NM", StringType(), False),
+    StructField("AUTHOR_NM", StringType(), True),
     StructField("AUTHOR_TYPE", StringType(), False),
     StructField("TOTAL_CNT", IntegerType(), False),
     StructField("WEEK_UTC", IntegerType(), False),
@@ -70,7 +70,7 @@ fork_list = StructType([
     StructField("OWNER_NM", StringType(), False),
     StructField("URL", StringType(), False),
     StructField("CREATED_AT", StringType(), False),
-    StructField("UPDATED_AT", StringType(), False),
+    StructField("UPDATED_AT", StringType(), True),
     StructField("REPO_ID", StringType(), False)
 ])
 
@@ -78,11 +78,9 @@ fork_list = StructType([
 commit_list = StructType([
     StructField("ID", StringType(), False),
     StructField("URL", StringType(), False),
-    StructField("AUTHOR_ID", StringType(), False),
-    StructField("AUTHOR_NM", StringType(), False),
-    StructField("UPDATED_AT", StringType(), False),
-    StructField("MASSAGE", StringType(), False),
-    StructField("CREATED_AT", IntegerType(), False),
+    StructField("AUTHOR_ID", StringType(), True),
+    StructField("AUTHOR_NM", StringType(), True),
+    StructField("MASSAGE", StringType(), True),
     StructField("REPO_ID", StringType(), False)
 ])
 
@@ -90,11 +88,13 @@ commit_list = StructType([
 issue_and_pr = StructType([
     StructField("ID", StringType(), False),
     StructField("URL", StringType(), False),
+    StructField("TITLE", StringType(), False),
     StructField("USER_ID", StringType(), False),
-    StructField("USER_NM", IntegerType(), False),
+    StructField("USER_NM", StringType(), False),
+    StructField("STATE", StringType(), True),
     StructField("CREATED_AT", StringType(), False),
-    StructField("UPDATED_AT", StringType(), False),
-    StructField("CLOSED_AT", StringType(), False),
+    StructField("UPDATED_AT", StringType(), True),
+    StructField("CLOSED_AT", StringType(), True),
     StructField("REPO_ID", StringType(), False)
 ])
 

@@ -2,7 +2,7 @@
 import json
 import boto3
 import botocore
-from datetime import datetime
+from datetime import datetime, timedelta
 from botocore.exceptions import NoCredentialsError
 import pandas as pd
 
@@ -48,8 +48,8 @@ class awsfunc:
     
     def get_file_name_from_s3(self, Bucket, Path):
         objects = self.client.list_objects(Bucket=Bucket, Prefix = Path)
-        today = datetime.now().date()
-        file_key = ''
+        today = datetime.now().date() 
+        
 
         for obj in objects.get('Contents', []):
             last_modified = obj['LastModified'].date()

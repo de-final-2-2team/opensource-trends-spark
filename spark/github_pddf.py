@@ -110,6 +110,7 @@ class PD_df:
                         'TITLE' : issue_dict['TITLE'],
                         'USER_ID' : issue_dict['USER_ID'],
                         'USER_NM' : issue_dict['USER_NM'],
+                        'STATE' : issue_dict['STATE'],
                         'CREATED_AT' : issue_dict['CREATED_AT'],
                         'UPDATED_AT' : issue_dict['UPDATED_AT'],
                         'CLOSED_AT' : issue_dict['CLOSED_AT'],
@@ -123,6 +124,7 @@ class PD_df:
                         'TITLE' : pr_dict['TITLE'],
                         'USER_ID' : pr_dict['USER_ID'],
                         'USER_NM' : pr_dict['USER_NM'],
+                        'STATE' : pr_dict['STATE'],
                         'CREATED_AT' : pr_dict['CREATED_AT'],
                         'UPDATED_AT' : pr_dict['UPDATED_AT'],
                         'CLOSED_AT' : pr_dict['CLOSED_AT'],
@@ -136,7 +138,6 @@ class PD_df:
                         'AUTHOR_ID' : commit_dict['AUTHOR_ID'],
                         'AUTHOR_NM' : commit_dict['AUTHOR_NM'],
                         'MESSAGE' : commit_dict['MESSAGE'],
-                        'CREATED_AT' : commit_dict['CREATED_AT'],
                         'REPO_ID': REPO_ID
                     })
             
