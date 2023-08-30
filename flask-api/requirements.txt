@@ -1,5 +1,0 @@
-flask==2.2.3
-flask_restx
-redis
-requests
-boto3
