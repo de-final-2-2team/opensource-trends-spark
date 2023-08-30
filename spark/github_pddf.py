@@ -152,4 +152,3 @@ class PD_df:
         commit_df = pd.DataFrame(commit_json)
 
         return issue_df, pr_df, commit_df
-

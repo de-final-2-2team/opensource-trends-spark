@@ -3,6 +3,7 @@ from airflow.models import Variable
 from airflow.providers.amazon.aws.operators.emr import EmrCreateJobFlowOperator, EmrTerminateJobFlowOperator, EmrAddStepsOperator
 from airflow.providers.amazon.aws.sensors.emr import EmrJobFlowSensor
 from datetime import datetime
+<<<<<<< HEAD
 from plugins.slack import SlackAlert
 
 def send_slack_message():
@@ -12,6 +13,8 @@ def send_slack_message():
     slack_token = s3_handler.getapikey(secret_id="slack-token")
     slack_alert = SlackAlert(channel="#monitoring_airflow", token=slack_token)
     return slack_alert
+=======
+>>>>>>> 1c9cc706405ce16672123a84b50597b76558b211
 
 SPARK_STEPS = [
     {
