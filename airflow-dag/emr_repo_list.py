@@ -3,7 +3,6 @@ from airflow.models import Variable
 from airflow.providers.amazon.aws.operators.emr import EmrCreateJobFlowOperator, EmrTerminateJobFlowOperator, EmrAddStepsOperator
 from airflow.providers.amazon.aws.sensors.emr import EmrJobFlowSensor
 from datetime import datetime
-<<<<<<< HEAD
 from plugins.slack import SlackAlert
 
 def send_slack_message():
@@ -13,8 +12,6 @@ def send_slack_message():
     slack_token = s3_handler.getapikey(secret_id="slack-token")
     slack_alert = SlackAlert(channel="#monitoring_airflow", token=slack_token)
     return slack_alert
-=======
->>>>>>> 1c9cc706405ce16672123a84b50597b76558b211
 
 SPARK_STEPS = [
     {
@@ -64,7 +61,7 @@ JOB_FLOW_OVERRIDES = {
 with DAG(
     dag_id="emr_repo_list",
     start_date=datetime(2023, 8, 29),
-    schedule='30 */12 * * *',
+    schedule='50 */12 * * *',
     catchup=False,
     on_success_callback=send_slack_message().success_alert,
     on_failure_callback=send_slack_message().fail_alert

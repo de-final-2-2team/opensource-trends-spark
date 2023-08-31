@@ -38,6 +38,7 @@ class awsfunc:
     
     def ec2tos3(self, Body, Bucket, Path):
         # ec2에서 추출한 데이터 s3로 write
+<<<<<<< HEAD:spark/awsfunc.py
         self.client.put_object(Body=Body, Bucket=Bucket, Key=Path)
 
     def read_json_from_s3(self, Bucket, Path):
@@ -54,3 +55,7 @@ class awsfunc:
         return file_path
             
             
+=======
+        encoded_data = Body.encode('utf-8')
+        self.client.put_object(Body=encoded_data, Bucket=Bucket, Key=Key)
+>>>>>>> 561d7458b91872ad87e4b7a86d4b1fdecf53ecb8:dags/plugins/awsfunc.py

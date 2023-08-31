@@ -60,17 +60,11 @@ JOB_FLOW_OVERRIDES = {
 
 with DAG(
     dag_id="emr_info",
-<<<<<<< HEAD
     start_date=datetime(2023, 8, 29),
     schedule='50 * * * *',
     catchup=False,
     on_success_callback=send_slack_message().success_alert,
     on_failure_callback=send_slack_message().fail_alert
-=======
-    start_date=datetime(2023, 6, 15),
-    schedule='@once',
-    catchup=False
->>>>>>> 1c9cc706405ce16672123a84b50597b76558b211
 ) as dag:
     create_job_flow = EmrCreateJobFlowOperator(
         task_id="create_job_flow",
