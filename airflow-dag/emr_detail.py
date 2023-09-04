@@ -3,21 +3,30 @@ from airflow.models import Variable
 from airflow.providers.amazon.aws.operators.emr import EmrCreateJobFlowOperator, EmrTerminateJobFlowOperator, EmrAddStepsOperator
 from airflow.providers.amazon.aws.sensors.emr import EmrJobFlowSensor
 from datetime import datetime
+from plugins.slack import SlackAlert
+
+def send_slack_message():
+    from plugins.awsfunc import awsfunc
+
+    s3_handler = awsfunc('secretsmanager')
+    slack_token = s3_handler.getapikey(secret_id="slack-token")
+    slack_alert = SlackAlert(channel="#monitoring_airflow", token=slack_token)
+    return slack_alert
 
 SPARK_STEPS = [
     {
-        "Name": "update_packages",      # 시스팀 업데이트
+        "Name": "emr_detail",      # 시스팀 업데이트
         "ActionOnFailure": "CONTINUE",  # 실패해도 다음 스텝 실행
         "HadoopJarStep": {
             "Jar": "command-runner.jar",
             "Args": [
                 'bash', '-c',
-                'pip3 install PyArrow pandas boto3 pyspark --use-feature=2020-resolver && ' +
-                'aws s3 cp s3://de-2-2/spark_scripts/github_repo_list_transform.py ./ && ' +
+                'pip3 install findspark PyArrow pandas boto3 --use-feature=2020-resolver && ' +
+                'aws s3 cp s3://de-2-2/spark_scripts/github_detail_transform.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/awsfunc.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_schema.py ./ && ' +
                 'aws s3 cp s3://de-2-2/spark_scripts/github_pddf.py ./ && ' +
-                'python3 github_repo_list_transform.py'
+                'python3 github_detail_transform.py'
             ],
         },
     },
@@ -25,7 +34,7 @@ SPARK_STEPS = [
 
 
 JOB_FLOW_OVERRIDES = {
-    "Name": "DE-2-2-EMR_test",
+    "Name": "DE-2-2-EMR_Detail",
     "ReleaseLabel": "emr-6.12.0",
     "Applications": [{"Name": "Spark"}],
     "LogUri": "s3://de-2-2/cluster-log",
@@ -50,10 +59,12 @@ JOB_FLOW_OVERRIDES = {
 }
 
 with DAG(
-    dag_id="emr_test",
-    start_date=datetime(2023, 6, 15),
-    schedule='@once',
-    catchup=False
+    dag_id="emr_detail",
+    start_date=datetime(2023, 8, 29),
+    schedule='50 * * * *',
+    catchup=False,
+    on_success_callback=send_slack_message().success_alert,
+    on_failure_callback=send_slack_message().fail_alert
 ) as dag:
     create_job_flow = EmrCreateJobFlowOperator(
         task_id="create_job_flow",

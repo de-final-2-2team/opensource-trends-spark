@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+import findspark
+findspark.init()
+
 from pyspark.sql import SparkSession
 from pyspark import SparkConf 
+from pyspark.sql.functions import lit
 import github_schema
-import github_pddf
+from github_pddf import PD_df
 from awsfunc import awsfunc
+from datetime import datetime
 
 # spark session 설정 및 생성
 conf = SparkConf()
@@ -14,32 +19,30 @@ conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
 
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
+timestamp = datetime.now()
 
 # padnas dataframe to spark dataframe
-commit_list_df= spark.createDataFrame(github_pddf.commit_list, schema = github_schema.commit_list)
-issue_and_pr_df= spark.createDataFrame(github_pddf.issue_and_pr, schema = github_schema.issue_and_pr)
+pd_df = PD_df()
+issue_list, pr_list, commit_list = pd_df.detail_list()
 
-commit_list_df.printSchema()
-issue_and_pr_df.printSchema()
+pd_df_list = [issue_list, pr_list, commit_list]
+pd_df_str_list = ['issue_list', 'pr_list', 'commit_list']
+schema_list = [github_schema.issue_list, github_schema.pr_list, github_schema.commit_list]
 
-# 중복 제거
-issue_and_pr_df.dropDuplicates()
+for i in range(len(pd_df_list)):
+    if not pd_df_list[i].empty:
+        df = spark.createDataFrame(pd_df_list[i], schema = schema_list[i])
+        df.printSchema()
 
+        # 중복 제거
+        df.dropDuplicates()
 
-# dataframe to json
-commit_list_df.show()
-issue_and_pr_df.show()
+        # 수집 날짜 추가
+        df = df.withColumn("COLLECTED_AT", lit(timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")))
+        df.show()
 
-commit_list_path = 's3a://de-2-2/analytics/github/commit_list/2023/08/24.json'
-issue_and_pr_path = 's3a://de-2-2/analytics/github/issue_and_pr/2023/08/24.json'
-
-
-commit_list_json = commit_list_df.toJSON().collect()
-issue_and_pr_json = issue_and_pr_df.toJSON().collect()
-
-s3_client = awsfunc('s3')
-
-s3_client.ec2tos3('\n'.join(commit_list_json),'de-2-2', 'analytic/github/commit_list/2023/08/24.json')
-s3_client.ec2tos3('\n'.join(issue_and_pr_json),'de-2-2', 'analytic/github/issue_and_pr/2023/08/24.json')
+        # spark dataframe to parquet
+        path = f's3://de-2-2/analytics/github/{pd_df_str_list[i]}/{timestamp.strftime("%Y/%m/%d")}'
+        df.coalesce(1).write.mode("append").parquet(path)
 
 spark.stop()

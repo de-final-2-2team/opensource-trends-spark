@@ -10,10 +10,9 @@ from github_pddf import PD_df
 from awsfunc import awsfunc
 from datetime import datetime
 
-
 # spark session 설정 및 생성
 conf = SparkConf()
-conf.set("spark.app.name", "Metric Data Process")
+conf.set("spark.app.name", "Repository List Data Process")
 conf.set("spark.master", "local[*]")
 conf.set("spark.sql.execution.arrow.enabled", "true")
 conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
@@ -22,23 +21,25 @@ spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 timestamp = datetime.now()
 
-pd_df = PD_df()
-
 # padnas dataframe to spark dataframe
-commit_activity_df= spark.createDataFrame(pd_df.commit_activity(), schema = github_schema.commit_activity)
+pd_df = PD_df()
+license_list_df = spark.createDataFrame(pd_df.license_list(), schema = github_schema.license_list)
 
-commit_activity_df.printSchema()
+license_list_df.printSchema()
+
 
 # 중복 제거
-commit_activity_df.dropDuplicates()
+license_list_df.dropDuplicates()
 
 # 수집날짜 추가
-commit_activity_df = commit_activity_df.withColumn("COLLECTED_AT", lit(timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")))
+license_list_df = license_list_df.withColumn("COLLECTED_AT", lit(timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")))
 
-commit_activity_df.show()
+license_list_df.show()
 
 
 # dataframe to parquet
-path = f's3://de-2-2/analytics/github/commit_activity/{timestamp.strftime("%Y/%m/%d")}'
-commit_activity_df.coalesce(1).write.mode("append").parquet(path)
+
+path = f's3://de-2-2/analytics/github/license_list/{timestamp.strftime("%Y/%m/%d")}'
+license_list_df.coalesce(1).write.mode("append").parquet(path)
+
 spark.stop()
